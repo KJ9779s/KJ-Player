@@ -1,0 +1,439 @@
+/* --- 基礎設定 --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Noto Sans TC", sans-serif;
+    /* 禁止手機端雙擊縮放行為 */
+    touch-action: manipulation;
+}
+
+body {
+    background-color: #000;
+    background-image: url('back.jpg');
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    height: 100dvh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
+}
+
+#bg-video {
+    position: fixed;
+    top: 50%; left: 50%;
+    width: 100.2vw; height: 100.2dvh;
+    object-fit: cover;
+    transform: translate(-50%, -50%);
+    z-index: -1;
+    filter: brightness(0.4);
+}
+
+/* --- 視圖與內容區 --- */
+#content-area {
+    position: relative;
+    /* 調整高度以確保不被播放器遮擋 */
+    height: calc(100dvh - 125px); 
+    overflow: hidden; 
+    padding-top: 1px;
+}
+
+.view {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    /* 讓每個頁面各自擁有獨立捲軸 */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    
+    padding: 40px 30px;
+    box-sizing: border-box;
+    
+    /* 預設隱藏 */
+    display: none;
+}
+.view.active {
+    display: block;
+}
+
+/* Chrome, Safari, Edge 捲軸樣式 */
+.view::-webkit-scrollbar {
+    width: 6px;
+}
+.view::-webkit-scrollbar-track {
+    background: #000; 
+}
+.view::-webkit-scrollbar-thumb {
+    background: #555; 
+    border-radius: 3px;
+}
+
+/* 確保所有頁面的標題樣式統一 */
+h1 { 
+    margin-bottom: 30px; 
+    font-size: 32px; /* 從 24px 加大 */
+    padding-left: 5px;
+}
+
+/* --- 響應式網格設定 --- */
+.music-grid {
+    display: grid;
+    /* 手機版：強制 2 欄，自動分為 2 列 (利用 view 的 height: 100%) */
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr); 
+    gap: 20px; /* 卡片間距 */
+    list-style: none;
+    height: 100%; /* 確保撐滿容器，讓 2x2 填滿畫面 */
+}
+
+/* 歌曲卡片樣式 */
+.music-grid li {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px; /* 手機端增加 padding 讓卡片看起來更大 */
+    border-radius: 16px;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.3s;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* 強制填滿 grid 區域 */
+}
+
+/* 圖片放大 */
+.music-grid li img {
+    width: 90%; /* 圖片佔滿卡片大部分空間 */
+    aspect-ratio: 1 / 1;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    object-fit: cover;
+}
+
+/* 文字樣式 */
+.music-grid li p {
+    font-size: 14px; /* 手機端字體適度調整 */
+    margin-top: 5px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* --- 電腦版設定 (寬螢幕) --- */
+@media (min-width: 900px) {
+    .music-grid {
+        /* 強制 6 個一橫排 */
+        grid-template-columns: repeat(6, 1fr);
+        grid-template-rows: auto;
+        height: auto;
+    }
+
+    .music-grid li {
+        height: auto; /* 電腦版恢復自然高度 */
+        padding: 15px;
+    }
+}
+
+.music-grid li:hover { background: rgba(255, 255, 255, 0.15); }
+
+
+/* --- 音樂庫條列式清單樣式 --- */
+.music-list {
+    list-style: none;
+    padding: 0;
+}
+
+.music-list li {
+    display: flex;
+    align-items: center;
+    padding: 18px 15px; /* 增加點擊區域 */
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px; /* 整體文字加大 */
+}
+
+.music-list li:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.music-list li img {
+    margin-right: 15px;
+    object-fit: cover;
+}
+
+.playlist-cover {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #5b247a 0%, #1bcedf 100%);
+    border-radius: 4px;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+/* --- 底部固定播放器 (Mini Player) --- */
+#bottom-player {
+    position: fixed;
+    bottom: 60px;
+    left: 10px; right: 10px;
+    height: 65px;
+    background: #181818;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.mini-main {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+#mini-img {
+    width: 45px; height: 45px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.mini-info { flex: 1; margin-left: 15px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+.mini-controls {
+    display: flex;
+    gap: 15px;
+    margin-left: 10px;
+}
+
+.mini-controls button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    width: 30px;
+}
+
+/* --- 底部導航欄 --- */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    background: #000;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid #333;
+    z-index: 2000;
+}
+
+.bottom-nav a {
+    color: #b3b3b3;
+    text-decoration: none;
+    font-size: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+    padding: 5px;
+    border-radius: 8px;
+}
+
+/* 導航選中發光效果 */
+.bottom-nav a.active {
+    color: #fff;
+    text-shadow: 0 0 10px #ff85a2, 0 0 20px #ff85a2;
+}
+
+/* --- 全螢幕播放頁 (Full Player) --- */
+#full-player {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #000;
+    z-index: 5000;
+    display: none; 
+    flex-direction: column;
+    padding: 20px;
+}
+
+#full-player.active { display: flex; }
+
+.player-card {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+}
+
+.player-header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.player-header button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.main-view-container {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.active-view { display: flex; flex-direction: column; align-items: center; width: 100%; }
+.inactive-view { display: none; }
+
+.img-area img {
+    width: 300px;
+    height: 300px;
+    border-radius: 12px;
+    object-fit: cover;
+    margin-bottom: 20px;
+}
+
+.lyrics-area {
+    width: 100%;
+    height: 400px;
+    overflow-y: auto;
+    mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+    text-align: center;
+}
+
+.lyric-line {
+    padding: 15px;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+    font-size: 18px;
+    color: #fff;
+}
+.lyric-line.active {
+    opacity: 1;
+    color: #ff85a2 !important;
+    font-size: 22px;
+    font-weight: bold;
+}
+.time-labels {
+    display: flex;
+    justify-content: space-between;
+    color: #b3b3b3;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* --- 控制區域樣式 --- */
+.controls-area { width: 100%; max-width: 400px; margin-top: auto; padding-bottom: 20px; }
+
+.progress-container {
+    width: 100%;
+    height: 5px;
+    background: #444;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.progress-bar {
+    width: 0%;
+    height: 100%;
+    background: #ff85a2 !important;
+    border-radius: 5px;
+    transition: width 0.1s;
+}
+
+.main-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+}
+
+.main-controls button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+#play-pause-btn { font-size: 50px; }
+
+#lyrics-view { position: relative; }
+
+#btn-translate {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    z-index: 10;
+}
+
+/* 修改為僅在支援滑鼠的裝置上才執行 hover 效果 */
+@media (hover: hover) {
+    #btn-translate:hover { 
+        background: #ff85a2; 
+        color: #000; 
+    }
+}
+
+.mini-controls button, .main-controls button {
+    transition: color 0.3s ease;
+}
+
+#full-loop-btn { font-size: 30px !important; }
+
+#announcement-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(255, 133, 162, 0.7); 
+    color: #fff;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 3000;
+    font-size: 14px;
+    /* 可選：加入毛玻璃效果 */
+    backdrop-filter: blur(5px);
+}
+
+#announcement-bar button {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+/* 調整內容區域，避免被公告欄遮擋 */
+#content-area {
+    margin-top: 40px; /* 根據公告欄高度調整 */
+    height: calc(100dvh - 125px - 40px);
+}
