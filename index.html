@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>不是設計愛情 是設計我</title>
+	<link rel="manifest" href="manifest.json">
+	<link rel="apple-touch-icon" href="images/icon-512.png">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 	<!-- 新增公告欄 -->
 	<div id="announcement-bar">
-        <span>※《Apple Candy》《單曲循環》《Break My Rules》請移步各大串流平台～</span>
+        <span>※ 想聽《Apple Candy》《單曲循環》《Break My Rules》請移步各大串流平台～</span>
         <button onclick="closeAnnouncement()"><i class="fas fa-times"></i></button>
     </div>
 
@@ -27,7 +29,7 @@
         	<ul id="home-list" class="music-grid"></ul>
     	</div>
     
-    <!-- 音樂庫預設沒有 active -->
+    
     	<div id="library-view" class="view">
         	<h1>9779s 的音樂庫</h1>
         	<ul id="library-list" class="music-list"></ul>
@@ -37,7 +39,7 @@
     <!-- 底部固定播放器 (Mini Player) -->
     <div id="bottom-player">
         <div class="mini-main" onclick="togglePlayerView()">
-            <img src="default-cover.jpg" id="mini-img" alt="Cover">
+            <img src="images/default-cover.jpg" id="mini-img" alt="Cover">
             <div class="mini-info">
                 <p id="mini-name">選擇一首歌</p>
 				<p id="playlist-label" style="font-size: 10px; color: #ff85a2; margin:0;"></p>
@@ -58,13 +60,12 @@
     			<button onclick="togglePlayerView()"><i class="fas fa-chevron-down"></i></button>
     			<p id="full-playlist-label">正在播放</p>
     			<button id="view-switch-btn" onclick="toggleLyricsView()"><i class="fas fa-list-ul"></i></button>
-			</div> <!-- 確保這裡只有關閉 player-header 的 div -->
+			</div> 
             <div class="main-view-container">
                 <div id="cover-view" class="active-view">
                     <div class="img-area">
                         <img src="" alt="Cover" id="main-img">
                     </div>
-                    <!-- 修正後的結構，確保寬度與圖片對齊且愛心在右側 -->
                     <div class="song-details" style="width: 300px; display: flex; align-items: center; justify-content: space-between; margin-top: 15px;">
                         <div style="overflow: hidden; text-align: left;">
                             <p class="name" style="margin:0; font-size: 20px; font-weight: bold;"></p>
